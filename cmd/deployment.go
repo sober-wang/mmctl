@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"regexp"
 
 	"mmctl/common"
 
@@ -13,8 +14,9 @@ import (
 )
 
 var (
-	fwk   string
-	AppID = &cobra.Command{
+	fwk    string
+	allApp bool
+	AppID  = &cobra.Command{
 		Use:   "appid",
 		Short: "Show Marathon appids",
 		Run: func(cmd *cobra.Command, args []string) {
@@ -27,30 +29,70 @@ var (
 func init() {
 	cobra.OnInitialize(common.InitConfig)
 	AppID.Flags().StringVarP(&fwk, "framework", "m", "", "Select a FrameWork show appid")
+	AppID.Flags().BoolVarP(&allApp, "all-appid", "", false, "Show all framework all appid")
+}
+
+// getOneM 只获取 -m 参数中的 appid
+func getOneM(murl string) {
+	data := GetMarthonAppID(murl)
+	tmp := matchAppID(data)
+	common.Show(tmp, 0)
+}
+
+// showAllAppid 展示集群下所有 appid
+func showAllAppid() {
+	tmp := common.GetFwk()
+	fwkList := common.FwkInfo(tmp)
+	for _,v := range fwkList{
+			if v[3] == "false"{
+					break
+			}
+
+	if ok,err:=regexp.MatchString("^http.*",v[2]);err !=nil && !ok{
+			fmt.Println("Not")
+	}else if ok {
+			fmt.Println("\n",v[0])
+			url := fmt.Sprintf("%v/v2/apps",v[2])
+			
+			getOneM(url)
+	}
+	}
 }
 
 // run 运行命令
 func run(args []string) {
-	if fwk == "" {
+	if fwk == "" && allApp == false {
 		fmt.Println(`
 		You should give me a framework name
 		1. mmctl get framework 
 		2. mmctl get appid -m myfwk
+		or 
+		mmctl get appid --all-appid
 		`)
 		return
-	}
+	} else if fwk != "" {
 	murl := makeMURL(fwk)
-	// 判断是否有参数 如果没有则展示所有 appid
-	if len(args) == 0 {
-		data := GetMarthonAppID(murl)
-		tmp := matchAppID(data)
-		common.Show(tmp, 0)
+		getOneM(murl)
 		return
 	}
-	murl = fmt.Sprintf("%v/%v", murl, args[0])
-	oneData := GetMarthonAppID(murl)
-	oneApp := matchOneID(oneData, args[0])
-	common.Show(oneApp, 1)
+	fmt.Printf("New param ---->%v ,Param number %v\n", allApp, len(args))
+	showAllAppid()
+
+	// 判断是否有参数 如果没有则展示所有 appid
+	/*
+		if len(args) == 0 {
+		  murl := makeMURL(fwk)
+			data := GetMarthonAppID(murl)
+			tmp := matchAppID(data)
+			common.Show(tmp, 0)
+			return
+		}
+		/*
+		murl = fmt.Sprintf("%v/%v", murl, args[0])
+		oneData := GetMarthonAppID(murl)
+		oneApp := matchOneID(oneData, args[0])
+		common.Show(oneApp, 1)
+	*/
 }
 
 // getMURL 构建 marathon URI

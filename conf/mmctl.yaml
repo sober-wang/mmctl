@@ -1,11 +1,9 @@
 mmctl:
   marathon:
-    ip: 20.26.17.127
-    port: 8080
     user: dcosadmin
     passwd: zjdcos02
   mesos:
-    ip: 20.26.17.127
+    ip: 192.168.56.101
     port: 5050
   zookeeper:
     ip: 20.26.17.127
