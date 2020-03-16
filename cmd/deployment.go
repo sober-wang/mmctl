@@ -43,19 +43,19 @@ func getOneM(murl string) {
 func showAllAppid() {
 	tmp := common.GetFwk()
 	fwkList := common.FwkInfo(tmp)
-	for _,v := range fwkList{
-			if v[3] == "false"{
-					break
-			}
+	for _, v := range fwkList {
+		if v[3] == "false" {
+				continue
+		}
 
-	if ok,err:=regexp.MatchString("^http.*",v[2]);err !=nil && !ok{
+		if ok, err := regexp.MatchString("^http.*", v[2]); err != nil && !ok {
 			fmt.Println("Not")
-	}else if ok {
-			fmt.Println("\n",v[0])
-			url := fmt.Sprintf("%v/v2/apps",v[2])
-			
+		} else if ok {
+			fmt.Printf("\nFrameWork ---------> %v ,URL is %v\n", v[0],v[2])
+			url := fmt.Sprintf("%v/v2/apps", v[2])
+
 			getOneM(url)
-	}
+		}
 	}
 }
 
@@ -71,11 +71,10 @@ func run(args []string) {
 		`)
 		return
 	} else if fwk != "" {
-	murl := makeMURL(fwk)
+		murl := makeMURL(fwk)
 		getOneM(murl)
 		return
 	}
-	fmt.Printf("New param ---->%v ,Param number %v\n", allApp, len(args))
 	showAllAppid()
 
 	// 判断是否有参数 如果没有则展示所有 appid

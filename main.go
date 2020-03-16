@@ -31,7 +31,12 @@ func main() {
 			Use: "get",
 			Short: "Get Mesos and Marathon information",
 	}
+	inspect := &cobra.Command{
+			Use: "inspect",
+			Short: "Inspect a appid details information",
+	}
 	mainCmd.AddCommand(get)
+	mainCmd.AddCommand(inspect)
 //	mema.AppID.Flags().StringVarP(&fwk,"framework","f","","Select a FrameWork show appid")
 	get.AddCommand(
 		version(),
