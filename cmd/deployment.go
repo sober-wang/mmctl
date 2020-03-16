@@ -45,15 +45,14 @@ func showAllAppid() {
 	fwkList := common.FwkInfo(tmp)
 	for _, v := range fwkList {
 		if v[3] == "false" {
-				continue
+			continue
 		}
 
 		if ok, err := regexp.MatchString("^http.*", v[2]); err != nil && !ok {
 			fmt.Println("Not")
 		} else if ok {
-			fmt.Printf("\nFrameWork ---------> %v ,URL is %v\n", v[0],v[2])
+			fmt.Printf("\nMarathon Name is [ %v ],Marathon URL is %v\n", v[0], v[2])
 			url := fmt.Sprintf("%v/v2/apps", v[2])
-
 			getOneM(url)
 		}
 	}
@@ -61,7 +60,25 @@ func showAllAppid() {
 
 // run 运行命令
 func run(args []string) {
-	if fwk == "" && allApp == false {
+	switch {
+	// 展示指定的 appid
+	case fwk != "" && len(args) != 0:
+		fmt.Println(args[0])
+		murl := fmt.Sprintf("%v/%v", makeMURL(fwk), args[0])
+		oneData := GetMarthonAppID(murl)
+		oneApp := matchOneID(oneData, args[0])
+		common.Show(oneApp, 1)
+		return
+	// 展示指定 marathons 下的 appid
+	case fwk != "":
+		murl := makeMURL(fwk)
+		getOneM(murl)
+		return
+	// 展示Mesos 上所有的 appid
+	case allApp == true:
+		showAllAppid()
+		return
+	default:
 		fmt.Println(`
 		You should give me a framework name
 		1. mmctl get framework 
@@ -70,28 +87,8 @@ func run(args []string) {
 		mmctl get appid --all-appid
 		`)
 		return
-	} else if fwk != "" {
-		murl := makeMURL(fwk)
-		getOneM(murl)
-		return
-	}
-	showAllAppid()
 
-	// 判断是否有参数 如果没有则展示所有 appid
-	/*
-		if len(args) == 0 {
-		  murl := makeMURL(fwk)
-			data := GetMarthonAppID(murl)
-			tmp := matchAppID(data)
-			common.Show(tmp, 0)
-			return
-		}
-		/*
-		murl = fmt.Sprintf("%v/%v", murl, args[0])
-		oneData := GetMarthonAppID(murl)
-		oneApp := matchOneID(oneData, args[0])
-		common.Show(oneApp, 1)
-	*/
+	}
 }
 
 // getMURL 构建 marathon URI
