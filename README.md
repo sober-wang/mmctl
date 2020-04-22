@@ -4,7 +4,7 @@ You can use mmctl display appid's at Mesos + Marathon
 
 # building mmctl 
 ENV
-Go version: 1.13.5
+- Go version: 1.13.5
 
 
 ```shell
